@@ -376,7 +376,7 @@ with tab1:
     full_display['GDP_Per_Capita']  = '$' + full_display['GDP_Per_Capita'].round(0).astype(int).astype(str)
     full_display['Final_Score']     = full_display['Final_Score'].round(3).astype(str)
     full_display.columns            = ['#', 'Country', 'Region', 'Population', 'Growth', 'GDP/capita', 'Score']
-    st.dataframe(full_display, use_container_width=True, hide_index=True, height=400)
+    st.dataframe(top10_display, use_container_width=True, hide_index=True, height=400)
 
 # ─── TAB 2 — POPULATION TRENDS ───────────────────────────────────────────────
 with tab2:
