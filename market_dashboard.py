@@ -184,10 +184,10 @@ section[data-testid="stSidebar"] * { color: #c8d6f0 !important; }
 # ── Load Data ─────────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
-    fact   = fact = pd.read_csv(FACT_URL)
-    region = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\dim_region.csv")
-    age    = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\dim_age.csv")
-    gdp    = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\gdp_table.csv")
+    fact   = pd.read_csv(FACT_URL)
+    region = pd.read_csv("data/dim_region.csv")
+    age    = pd.read_csv("data/dim_age.csv")
+    gdp    = pd.read_csv("data/gdp_table.csv")
     region.loc[region['country'] == 'Sudan', 'Country ID'] = 729
     fact = fact.merge(region[['Country ID', 'country', 'Region']], on='Country ID', how='left')
     fact = fact.merge(age[['Age Group ID', 'Age Group', 'Age Category']], on='Age Group ID', how='left')
@@ -198,9 +198,9 @@ fact, dim_region, dim_age, gdp = load_data()
 # ── Build Scoring Table ───────────────────────────────────────────────────────
 @st.cache_data
 def build_score():
-    fact_raw = fact_raw = pd.read_csv(FACT_URL)
-    gdp_raw  = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\gdp_table.csv")
-    reg_raw  = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\dim_region.csv")
+    fact_raw = pd.read_csv(FACT_URL)
+    gdp_raw  = pd.read_csv("data/gdp_table.csv")
+    reg_raw  = pd.read_csv("data/dim_region.csv")
     reg_raw.loc[reg_raw['country'] == 'Sudan', 'Country ID'] = 729
 
     pop_2024 = fact_raw[fact_raw['Year'] == 2024].groupby('Country ID')['Population'].sum().reset_index()
