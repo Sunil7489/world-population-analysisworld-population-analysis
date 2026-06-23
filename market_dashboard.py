@@ -40,10 +40,14 @@ section[data-testid="stSidebar"] { background: #0d1117; border-right: 1px solid 
 # ── Load Data ─────────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
-    fact   = pd.read_csv("Fact Table.csv")
-    region = pd.read_csv("Dim Region.csv")
-    age    = pd.read_csv("Dim Age.csv")
-    gdp    = pd.read_csv("GDP Table.csv")
+    import os
+
+    BASE_DIR = os.path.dirname(__file__)
+
+    fact   = pd.read_csv(os.path.join(BASE_DIR, "Fact Table.csv"))
+    region = pd.read_csv(os.path.join(BASE_DIR, "Dim Region.csv"))
+    age    = pd.read_csv(os.path.join(BASE_DIR, "Dim Age.csv"))
+    gdp    = pd.read_csv(os.path.join(BASE_DIR, "GDP Table.csv"))
 
     # Fix Sudan Country ID consistency
     region.loc[region['country'] == 'Sudan', 'Country ID'] = 729
