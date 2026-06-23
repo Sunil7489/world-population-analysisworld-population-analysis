@@ -9,6 +9,8 @@ st.set_page_config(
     page_icon="🌍",
     layout="wide"
 )
+# ── Google Drive Fact Table URL ───────────────────────────────────────────────
+FACT_URL = "https://drive.google.com/uc?export=download&id=1oBJWEwYGYSYHpJgCWn-xPOuwy24ehac2"
 
 # ── Custom CSS ────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -182,7 +184,7 @@ section[data-testid="stSidebar"] * { color: #c8d6f0 !important; }
 # ── Load Data ─────────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
-    fact   = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\fact_table.csv")
+    fact   = fact = pd.read_csv(FACT_URL)
     region = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\dim_region.csv")
     age    = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\dim_age.csv")
     gdp    = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\gdp_table.csv")
@@ -196,7 +198,7 @@ fact, dim_region, dim_age, gdp = load_data()
 # ── Build Scoring Table ───────────────────────────────────────────────────────
 @st.cache_data
 def build_score():
-    fact_raw = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\fact_table.csv")
+    fact_raw = fact_raw = pd.read_csv(FACT_URL)
     gdp_raw  = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\gdp_table.csv")
     reg_raw  = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\dim_region.csv")
     reg_raw.loc[reg_raw['country'] == 'Sudan', 'Country ID'] = 729
