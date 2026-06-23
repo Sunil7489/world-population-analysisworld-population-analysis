@@ -40,10 +40,10 @@ section[data-testid="stSidebar"] { background: #0d1117; border-right: 1px solid 
 # ── Load Data ─────────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
-    fact   = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\Fact Table.csv")
-    region = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\Dim Region.csv")
-    age    = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\Dim Age.csv")
-    gdp    = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\GDP Table.csv")
+    fact   = pd.read_csv("Fact Table.csv")
+    region = pd.read_csv("Dim Region.csv")
+    age    = pd.read_csv("Dim Age.csv")
+    gdp    = pd.read_csv("GDP Table.csv")
 
     # Fix Sudan Country ID consistency
     region.loc[region['country'] == 'Sudan', 'Country ID'] = 729
@@ -61,9 +61,9 @@ fact, dim_region, dim_age, gdp = load_data()
 # ── Build Scoring Table ───────────────────────────────────────────────────────
 @st.cache_data
 def build_score():
-    fact_raw = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\Fact Table.csv")
-    gdp_raw  = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\GDP Table.csv")
-    reg_raw  = pd.read_csv(r"C:\Users\DELL\Desktop\population_project\Dim Region.csv")
+    fact_raw = pd.read_csv("Fact Table.csv")
+    gdp_raw = pd.read_csv("GDP Table.csv")
+    reg_raw = pd.read_csv("Dim Region.csv")
     reg_raw.loc[reg_raw['country'] == 'Sudan', 'Country ID'] = 729
 
     # Total population 2024 and 2050
