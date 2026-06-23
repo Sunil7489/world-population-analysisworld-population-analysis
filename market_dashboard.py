@@ -362,7 +362,7 @@ with tab1:
         top10_display['GDP_Per_Capita']  = '$' + top10_display['GDP_Per_Capita'].round(0).astype(int).astype(str)
         top10_display['Final_Score']     = top10_display['Final_Score'].round(3).astype(str)
         top10_display.columns            = ['#', 'Country', 'Region', 'Population', 'Growth', 'GDP/capita', 'Score']
-        st.dataframe(top10_display, use_container_width="stretch", hide_index=True, height=440)
+        st.dataframe(top10_display, use_container_width=True, hide_index=True, height=440)
 
     st.markdown("<div class='glow-divider'></div>", unsafe_allow_html=True)
     st.markdown("""
@@ -376,7 +376,7 @@ with tab1:
     full_display['GDP_Per_Capita']  = '$' + full_display['GDP_Per_Capita'].round(0).astype(int).astype(str)
     full_display['Final_Score']     = full_display['Final_Score'].round(3).astype(str)
     full_display.columns            = ['#', 'Country', 'Region', 'Population', 'Growth', 'GDP/capita', 'Score']
-    st.dataframe(full_display, use_container_width="stretch", hide_index=True, height=400)
+    st.dataframe(full_display, use_container_width=True, hide_index=True, height=400)
 
 # ─── TAB 2 — POPULATION TRENDS ───────────────────────────────────────────────
 with tab2:
