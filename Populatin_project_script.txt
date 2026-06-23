@@ -1,0 +1,100 @@
+                                                     poputation project script 
+
+
+import pandas as pd
+
+BASE = r"C:\Users\DELL\Desktop\population_project"
+
+# ── 1. Load & combine raw population files ──
+df1 = pd.read_csv(f"{BASE}\\Population-country-1950-1999.csv", skiprows=1, encoding="latin1", low_memory=False)
+df1 = df1.drop(columns=['Average'])
+
+df2 = pd.read_csv(f"{BASE}\\Population-country-2000-2049.csv", encoding="latin1", low_memory=False)
+
+df3 = pd.read_csv(f"{BASE}\\Population-country-2050-2100.csv", encoding="latin1", low_memory=False)
+df3 = df3.rename(columns={'Country': 'Location'})
+
+all_data = pd.concat([df1, df2, df3], ignore_index=True)
+all_data = all_data.dropna(how='all').dropna(subset=['Location'])
+
+# ── 2. Clean & reshape into long format ──
+clean = all_data.drop(columns=['AgeGrpStart', 'AgeGrpSpan']).copy()
+
+clean['AgeGrp'] = clean['AgeGrp'].replace({
+    '09-May': '5-9', '9-May': '5-9',
+    '14-Oct': '10-14',
+    '80+': '80-84',
+    '100+': '100-120'
+})
+
+clean['LocID'] = clean['LocID'].astype('int64')
+clean['Time'] = clean['Time'].astype('int64')
+
+clean = clean.rename(columns={
+    'LocID': 'Country ID', 'Location': 'country', 'Time': 'year',
+    'AgeGrp': 'Age Group', 'PopMale': 'Population Male',
+    'PopFemale': 'Population Female', 'PopTotal': 'Total Population'
+})
+
+clean = clean.melt(
+    id_vars=['Country ID', 'country', 'year', 'Age Group'],
+    value_vars=['Population Male', 'Population Female'],
+    var_name='Gender', value_name='Population'
+)
+clean['Gender'] = clean['Gender'].str.replace('Population', '')
+clean['Population'] = clean['Population'] * 1000
+
+clean.to_csv(f"{BASE}\\clean_population.csv", index=False)
+
+# ── 3. Dim Region ──
+dim_region = clean.drop(columns=['year', 'Age Group', 'Gender', 'Population']).drop_duplicates().reset_index(drop=True)
+
+codes = pd.read_csv(f"{BASE}\\codes-country-region.txt", sep="\t", encoding="latin1", keep_default_na=False)
+codes = codes.drop(columns=['a-2', 'a-3', 'Name']).rename(columns={'CC': 'Region Code', '#': 'Country ID'})
+codes = codes[(codes['Country ID'] != '') & (codes['Region Code'] != '') & (codes['Country ID'] != 'null')]
+codes['Country ID'] = codes['Country ID'].astype('int64')
+codes = codes.drop_duplicates(subset=['Country ID'])
+
+region_abbreviation = pd.DataFrame({
+    'Region Code': ['EU', 'AN', 'AF', 'OC', 'NA', 'AS', 'SA', 'ZZ'],
+    'Region': ['Europe', 'Antarctica', 'Africa', 'Oceania', 'North America', 'Asia', 'South America', 'Others']
+})
+
+country_region = codes.merge(region_abbreviation, on='Region Code', how='left')
+
+dim_region = dim_region.merge(country_region, on='Country ID', how='left').drop(columns=['Region Code'])
+dim_region.loc[dim_region['Country ID'] == 729, 'Region'] = 'Africa'   # Sudan
+dim_region.loc[dim_region['Country ID'] == 830, 'Region'] = 'Europe'  # Channel Islands
+
+dim_region.to_csv(f"{BASE}\\Dim Region.csv", index=False)
+
+# ── 4. Dim Age ──
+dim_age = clean[['Age Group']].drop_duplicates(subset='Age Group').copy()
+dim_age[['Age start', 'Age end']] = dim_age['Age Group'].str.split('-', expand=True)
+dim_age['Age end'] = pd.to_numeric(dim_age['Age end'])
+
+dim_age['Age Category'] = ''
+dim_age.loc[dim_age['Age end'] <= 3, 'Age Category'] = 'Kid'
+dim_age.loc[(dim_age['Age end'] > 3) & (dim_age['Age end'] <= 10), 'Age Category'] = 'Child'
+dim_age.loc[(dim_age['Age end'] > 10) & (dim_age['Age end'] <= 16), 'Age Category'] = 'Teenage'
+dim_age.loc[(dim_age['Age end'] > 16) & (dim_age['Age end'] <= 35), 'Age Category'] = 'Young'
+dim_age.loc[(dim_age['Age end'] > 35) & (dim_age['Age end'] <= 55), 'Age Category'] = 'Mature'
+dim_age.loc[(dim_age['Age end'] > 55) & (dim_age['Age end'] <= 70), 'Age Category'] = 'Senior'
+dim_age.loc[(dim_age['Age end'] > 70) & (dim_age['Age end'] <= 80), 'Age Category'] = 'Super Senior'
+dim_age.loc[dim_age['Age end'] > 80, 'Age Category'] = 'Old'
+
+dim_age = dim_age.drop(columns=['Age start', 'Age end'])
+dim_age.insert(0, 'Age Group ID', range(1, len(dim_age) + 1))
+
+dim_age.to_csv(f"{BASE}\\Dim Age.csv", index=False)
+
+# ── 5. Fact Table ──
+fact = clean.rename(columns={'country': 'Country', 'year': 'Year'})
+fact = fact.merge(dim_age, on='Age Group', how='left')
+fact = fact.drop(columns=['Country', 'Age Group', 'Age Category'])
+col = fact.pop('Age Group ID')
+fact.insert(1, 'Age Group ID', col)
+
+fact.to_csv(f"{BASE}\\Fact Table.csv", index=False)
+
+print("Done. Files created: clean_population.csv, Dim Region.csv, Dim Age.csv, Fact Table.csv")
