@@ -206,7 +206,7 @@ def build_score():
     pop_2024 = fact_raw[fact_raw['Year'] == 2024].groupby('Country ID')['Population'].sum().reset_index()
     pop_2024 = pop_2024.rename(columns={'Population': 'Population_2024'})
     pop_2050 = fact_raw[fact_raw['Year'] == 2050].groupby('Country ID')['Population'].sum().reset_index()
-    pop_2050 = pop_2050.rename(columns={'Populatcd "C:\Users\DELL\Desktop\population_project"ion': 'Population_2050'})
+    pop_2050 = pop_2050.rename(columns={'Population': 'Population_2050'})
 
     score_df = pop_2024.merge(pop_2050, on='Country ID', how='inner')
     score_df = score_df.merge(gdp_raw[['Country ID', 'GDP_Per_Capita']], on='Country ID', how='inner')
